@@ -85,21 +85,12 @@ export default function SidebarNav() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 h-screen w-80 bg-white shadow-lg transition-transform duration-300 z-40 ${
+        className={`fixed left-0 top-0 h-screen w-80 bg-[#FCE4EC] shadow-lg transition-transform duration-300 z-40 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         } overflow-y-auto`}
       >
-        {/* Logo & Close */}
-        <div className="p-6 border-b border-[#FAC1B5]/30 flex items-center justify-center">
-          <img
-            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/inas-JLJ6buduzGt8x41vQzIlnOz0J2HrXe.png"
-            alt="Minas Bakeshop Logo"
-            className="h-24 w-auto object-contain"
-          />
-        </div>
-
         {/* Navigation Menu */}
-        <nav className="p-6 space-y-1">
+        <nav className="p-6 space-y-1 mt-12">
           {/* Home */}
           <Link
             href="/"

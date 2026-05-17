@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Geist, Geist_Mono, Great_Vibes } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 import SidebarNav from '@/components/sidebar-nav'
@@ -7,6 +7,7 @@ import Header from '@/components/header'
 
 const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
+const greatVibes = Great_Vibes({ weight: '400', subsets: ['latin'], variable: '--font-great-vibes' });
 
 export const metadata: Metadata = {
   title: "Mina's Bakeshop - Crafting Sweetness Since 2024",
@@ -40,7 +41,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="font-sans antialiased">
+      <body className={`font-sans antialiased ${greatVibes.variable}`}>
         <CartProvider>
           <Header />
           <SidebarNav />

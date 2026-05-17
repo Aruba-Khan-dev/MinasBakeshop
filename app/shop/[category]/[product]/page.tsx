@@ -215,7 +215,13 @@ export default function ProductDetailPage({ params }: { params: Promise<{ catego
                 <p className="text-2xl font-bold mb-4" style={{ color: accentColor }}>
                   Rs. {(selectedSize?.price || sizes[0]?.price || 0).toLocaleString()}
                 </p>
-                {(product.category?.toLowerCase().includes('hamper') || product.category?.toLowerCase().includes('gift box') || product.category?.toLowerCase().includes('hampers') || product.category?.toLowerCase().includes('gift boxes')) && product.description && (
+                {(product.category?.toLowerCase().includes('hamper') || 
+                  product.category?.toLowerCase().includes('gift box') || 
+                  product.category?.toLowerCase().includes('hampers') || 
+                  product.category?.toLowerCase().includes('gift boxes') ||
+                  product.category?.toLowerCase() === 'cookies') && 
+                  product.description && 
+                  product.description.toLowerCase() !== 'cookies' && (
                   <p className="text-[#98898D] text-lg whitespace-pre-wrap">{product.description}</p>
                 )}
               </div>

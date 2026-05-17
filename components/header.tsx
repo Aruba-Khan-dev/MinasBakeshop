@@ -16,24 +16,37 @@ export default function Header() {
 
   const isAdminPage = pathname?.startsWith('/admin');
 
+  if (pathname === '/admin/login') {
+    return null;
+  }
+
   return (
     <header className="bg-white border-b border-[#FAC1B5]/20 sticky top-0 z-30">
-      <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between">
-        <Link href="/" className="flex-shrink-0">
-          <img
-            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/inas-JLJ6buduzGt8x41vQzIlnOz0J2HrXe.png"
-            alt="Minas Bakeshop Logo"
-            className="h-12 md:h-16 w-auto object-contain"
-          />
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between relative min-h-[60px]">
+        {/* Left Side: Search Bar (Desktop) */}
+        <div className="flex-1 flex justify-start">
+          {!isAdminPage && (
+            <div className="hidden md:block w-full max-w-xs">
+              <HeaderSearch variant="desktop" />
+            </div>
+          )}
+        </div>
+
+        {/* Center: Custom Text Logo */}
+        <Link 
+          href="/" 
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center whitespace-nowrap z-10"
+        >
+          <span className="font-[family-name:var(--font-great-vibes)] text-4xl md:text-5xl text-[#2C2C2C] leading-none mb-1">
+            Minas
+          </span>
+          <span className="font-['Times_New_Roman',Times,serif] text-[10px] md:text-xs tracking-[0.2em] text-[#2C2C2C] leading-none uppercase font-semibold">
+            Bakeshop
+          </span>
         </Link>
 
-        {!isAdminPage && (
-          <div className="hidden md:flex flex-1 max-w-md mx-8">
-            <HeaderSearch variant="desktop" />
-          </div>
-        )}
-
-        <div className="flex items-center gap-2 md:gap-4">
+        {/* Right Side: Icons */}
+        <div className="flex-1 flex items-center justify-end gap-2 md:gap-4">
           {!isAdminPage && (
             <>
               <button

@@ -314,3 +314,44 @@ export async function updateOrderStatus(orderId: string | number, status: string
   if (error) throw error;
   return data as Order;
 }
+
+// ─── Reviews ───
+
+export interface Review {
+  id?: string;
+  name: string;
+  rating: number;
+  review_text: string;
+  created_at?: string;
+  status?: string;
+}
+
+export async function submitReview(review: Omit<Review, 'id' | 'created_at'>) {
+  const { data, error } = await supabase
+    .from('reviews')
+    .insert(review)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data as Review;
+}
+
+export async function getReviews() {
+  const { data, error } = await supabase
+    .from('reviews')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return (data || []) as Review[];
+}
+
+export async function deleteReview(id: string) {
+  const { error } = await supabase
+    .from('reviews')
+    .delete()
+    .eq('id', id);
+
+  if (error) throw error;
+}

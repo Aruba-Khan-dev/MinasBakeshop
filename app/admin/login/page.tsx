@@ -108,7 +108,17 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F0E8DF]/40 flex items-center justify-center px-4 py-24">
+    <div className="min-h-screen bg-[#F0E8DF]/40 flex flex-col items-center justify-center px-4 py-24">
+      {/* Centered Custom Text Logo */}
+      <div className="flex flex-col items-center justify-center mb-8 whitespace-nowrap">
+        <span className="font-[family-name:var(--font-great-vibes)] text-5xl md:text-6xl text-[#2C2C2C] leading-none mb-1">
+          Minas
+        </span>
+        <span className="font-['Times_New_Roman',Times,serif] text-xs md:text-sm tracking-[0.2em] text-[#2C2C2C] leading-none uppercase font-semibold">
+          Bakeshop
+        </span>
+      </div>
+
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg border border-[#FAC1B5]/30 overflow-hidden">
         <div className="bg-[#2C2C2C] px-8 py-10 text-center text-white">
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#F283AE]/20">

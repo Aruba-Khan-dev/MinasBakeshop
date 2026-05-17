@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Quote } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Quote, CheckCircle } from 'lucide-react';
 import StarRating from './star-rating';
+import { supabase } from '@/lib/supabase';
 
 interface Review {
   id: number;
@@ -67,6 +68,8 @@ const curatedReviews: Review[] = [
 export default function ReviewsSection() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
 
   const [formData, setFormData] = useState({
@@ -97,11 +100,37 @@ export default function ReviewsSection() {
     setCurrentIndex((prev) => (prev + 1) % curatedReviews.length);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.name.trim() && formData.review.trim()) {
-      // Reset form after submission
+    if (!formData.name.trim() || !formData.review.trim() || formData.rating === 0) return;
+
+    setIsSubmitting(true);
+    setSubmitStatus('idle');
+    try {
+      const { error } = await supabase
+        .from('reviews')
+        .insert([
+          {
+            name: formData.name.trim(),
+            rating: formData.rating,
+            review_text: formData.review.trim(),
+            status: 'approved'
+          },
+        ]);
+
+      if (error) throw error;
+
       setFormData({ name: '', rating: 0, review: '' });
+      setSubmitStatus('success');
+      setTimeout(() => {
+        setSubmitStatus('idle');
+      }, 3000);
+    } catch (err: unknown) {
+      const e = err as { message?: string; code?: string; details?: string };
+      console.error('Error submitting review:', e?.message, e?.code, e?.details, err);
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -207,15 +236,34 @@ export default function ReviewsSection() {
               className="w-full px-4 py-3 border border-[#FAC1B5]/30 rounded-lg focus:outline-none focus:border-[#F283AE] resize-none h-24"
               required
             />
+            {submitStatus === 'error' && (
+              <p className="text-red-500 text-sm font-medium">
+                Something went wrong. Please try again.
+              </p>
+            )}
             <button
               type="submit"
-              className="w-full bg-[#F283AE] hover:bg-[#E86FA3] text-white py-3 rounded-lg font-semibold transition-colors"
+              disabled={isSubmitting || formData.rating === 0}
+              className="w-full bg-[#F283AE] hover:bg-[#E86FA3] disabled:opacity-60 disabled:cursor-not-allowed text-white py-3 rounded-lg font-semibold transition-colors"
             >
-              Submit Review
+              {isSubmitting ? 'Submitting…' : 'Submit Review'}
             </button>
           </form>
         </div>
       </div>
+
+      {/* Success Popup Overlay */}
+      {submitStatus === 'success' && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 backdrop-blur-sm transition-all duration-300">
+          <div className="flex flex-col items-center bg-white rounded-2xl p-8 shadow-xl border border-[#FAC1B5]/30 max-w-sm w-full animate-in fade-in zoom-in duration-300">
+            <CheckCircle className="w-16 h-16 text-green-500 mb-4" />
+            <h3 className="text-xl font-semibold text-[#2C2C2C] mb-2 text-center">Thank You!</h3>
+            <p className="text-center text-[#98898D]">
+              Your review has been successfully submitted.
+            </p>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
