@@ -5,7 +5,13 @@ import type { Order } from '@/lib/supabase';
 import { normalizeOrder, statusColor } from '@/lib/order-utils';
 import OrderDetailModal from '@/components/admin/order-detail-modal';
 
-export default function AdminOrdersTable({ orders: initialOrders }: { orders: Order[] }) {
+export default function AdminOrdersTable({ 
+  orders: initialOrders,
+  isCustom = false 
+}: { 
+  orders: Order[];
+  isCustom?: boolean;
+}) {
   const [orders, setOrders] = useState(initialOrders);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
@@ -43,10 +49,12 @@ export default function AdminOrdersTable({ orders: initialOrders }: { orders: Or
                       <p className="text-[#98898D]">Date</p>
                       <p className="font-medium text-[#2C2C2C]">{o.created_at?.slice(0, 10) || o.date || '—'}</p>
                     </div>
-                    <div>
-                      <p className="text-[#98898D]">Amount</p>
-                      <p className="font-semibold text-[#2C2C2C]">Rs. {Number(o.total_amount || 0).toLocaleString()}</p>
-                    </div>
+                    {!isCustom && (
+                      <div>
+                        <p className="text-[#98898D]">Amount</p>
+                        <p className="font-semibold text-[#2C2C2C]">Rs. {Number(o.total_amount || 0).toLocaleString()}</p>
+                      </div>
+                    )}
                   </div>
                   <button
                     type="button"
@@ -69,14 +77,14 @@ export default function AdminOrdersTable({ orders: initialOrders }: { orders: Or
                 <th className="px-6 py-4 text-left text-sm font-semibold text-[#98898D]">Customer</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-[#98898D]">Date</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-[#98898D]">Status</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-[#98898D]">Amount</th>
+                {!isCustom && <th className="px-6 py-4 text-left text-sm font-semibold text-[#98898D]">Amount</th>}
                 <th className="px-6 py-4 text-left text-sm font-semibold text-[#98898D]">Action</th>
               </tr>
             </thead>
             <tbody>
               {orders.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-10 text-center text-[#98898D]">
+                  <td colSpan={isCustom ? 5 : 6} className="px-6 py-10 text-center text-[#98898D]">
                     No orders found yet.
                   </td>
                 </tr>
@@ -101,9 +109,11 @@ export default function AdminOrdersTable({ orders: initialOrders }: { orders: Or
                           {o.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 font-semibold text-[#2C2C2C]">
-                        Rs. {Number(o.total_amount || 0).toLocaleString()}
-                      </td>
+                      {!isCustom && (
+                        <td className="px-6 py-4 font-semibold text-[#2C2C2C]">
+                          Rs. {Number(o.total_amount || 0).toLocaleString()}
+                        </td>
+                      )}
                       <td className="px-6 py-4">
                         <button
                           type="button"

@@ -2,7 +2,7 @@
 
 import { useAdminSidebar } from '@/context/admin-sidebar-context'
 import Link from 'next/link'
-import { LayoutDashboard, ClipboardList, Package, Layers, MessageSquare, Menu, X } from 'lucide-react'
+import { LayoutDashboard, ClipboardList, Package, Layers, MessageSquare, Menu, X, Sparkles } from 'lucide-react'
 import AdminLogoutButton from '@/components/admin-logout-button'
 import { useState } from 'react'
 
@@ -15,6 +15,7 @@ export default function AdminSidebar({ activeTab }: { activeTab: string }) {
     { id: 'products', label: 'Products', icon: Package, href: '/admin/products' },
     { id: 'categories', label: 'Categories', icon: Layers, href: '/admin/categories' },
     { id: 'orders', label: 'Orders', icon: ClipboardList, href: '/admin/orders' },
+    { id: 'custom-orders', label: 'Custom Orders', icon: Sparkles, href: '/admin/custom-orders' },
     { id: 'reviews', label: 'Reviews', icon: MessageSquare, href: '/admin/reviews' },
   ]
 

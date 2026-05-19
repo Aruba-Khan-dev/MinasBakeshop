@@ -63,6 +63,8 @@ export default function OrderDetailModal({
   const totalAmount = Number(order.total_amount || 0).toLocaleString()
   const deliveryLabel = isDelivery ? 'Delivery' : 'Pickup'
 
+  const isCustomOrder = Array.isArray(order.items) && order.items.some(item => item.category === 'Custom')
+
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="flex max-h-[90vh] max-w-[calc(100%-1rem)] flex-col p-4 sm:max-w-2xl sm:p-6">
@@ -105,10 +107,12 @@ export default function OrderDetailModal({
               <span className="text-xs text-[#98898D]">{Array.isArray(order.items) ? order.items.length : 0} items</span>
             </div>
             <OrderItemsList items={Array.isArray(order.items) ? order.items : []} />
-            <div className="mt-4 flex items-center justify-between border-t border-[#FAC1B5]/20 pt-4 text-base font-bold text-[#2C2C2C]">
-              <span>Total Price</span>
-              <span>Rs. {totalAmount}</span>
-            </div>
+            {!isCustomOrder && (
+              <div className="mt-4 flex items-center justify-between border-t border-[#FAC1B5]/20 pt-4 text-base font-bold text-[#2C2C2C]">
+                <span>Total Price</span>
+                <span>Rs. {totalAmount}</span>
+              </div>
+            )}
           </div>
         </div>
 

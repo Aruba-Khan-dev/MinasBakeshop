@@ -21,11 +21,6 @@ export default function Footer() {
               <h4 className="font-semibold mb-4 text-[#2C2C2C]">Quick Links</h4>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <Link href="/" className="text-[#98898D] hover:text-[#F283AE] transition-colors">
-                    Shop
-                  </Link>
-                </li>
-                <li>
                   <Link href="/customize" className="text-[#98898D] hover:text-[#F283AE] transition-colors">
                     Custom Order
                   </Link>

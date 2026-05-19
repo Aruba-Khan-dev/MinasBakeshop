@@ -15,6 +15,7 @@ import {
   stepIsValid,
   type MultiStepFormData,
 } from '@/lib/multi-step-validation';
+import { createOrder, supabase } from '@/lib/supabase';
 
 const INPUT_CLASS =
   'w-full px-4 py-3 border border-[#FAC1B5]/30 rounded-xl focus:outline-none focus:border-[#F283AE] focus:ring-2 focus:ring-[#F283AE]/20 transition-colors';
@@ -58,6 +59,7 @@ const ADD_ONS = [
 export default function MultiStepForm() {
   const [step, setStep] = useState(1);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     // Step 1: Customer Details
     name: '',
@@ -161,14 +163,7 @@ export default function MultiStepForm() {
     }
   };
 
-  const calculateAddOnsTotal = () => {
-    return formData.addOns.reduce((total, addOnId) => {
-      const addOn = ADD_ONS.find(a => a.id === addOnId);
-      return total + (addOn?.price || 0);
-    }, 0);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const allErrors = validateEntireMultiStepForm(formData as MultiStepFormData);
     setErrors(allErrors);
@@ -182,18 +177,88 @@ export default function MultiStepForm() {
       return;
     }
     setFormError('');
-    setFormData({
-      ...formData,
-      name: trimValue(formData.name),
-      phone: normalizePhoneDigits(formData.phone),
-      email: trimValue(formData.email),
-      address: trimValue(formData.address),
-      theme: trimValue(formData.theme),
-      colorPreferences: trimValue(formData.colorPreferences),
-      messageOnCake: trimValue(formData.messageOnCake),
-      specialInstructions: trimValue(formData.specialInstructions),
-    });
-    setIsSubmitted(true);
+    setIsSubmitting(true);
+
+    const cleanName = trimValue(formData.name);
+    const cleanPhone = normalizePhoneDigits(formData.phone);
+    const cleanEmail = trimValue(formData.email);
+    const cleanAddress = trimValue(formData.address);
+
+    try {
+      let referenceImageUrl = null;
+      if (formData.referenceImage) {
+        const fileExt = formData.referenceImage.name.split('.').pop() || 'jpg';
+        const fileName = `custom-${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
+        
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('product-images')
+          .upload(`custom-orders/${fileName}`, formData.referenceImage, {
+            cacheControl: '3600',
+            upsert: false
+          });
+          
+        if (uploadError) {
+          console.error('Image upload failed:', uploadError);
+        } else if (uploadData) {
+          const { data: { publicUrl } } = supabase.storage
+            .from('product-images')
+            .getPublicUrl(uploadData.path);
+          referenceImageUrl = publicUrl;
+        }
+      }
+
+      await createOrder({
+        customer_name: cleanName,
+        phone: cleanPhone,
+        email: cleanEmail || null,
+        delivery_method: formData.deliveryType,
+        address: formData.deliveryType === 'delivery' ? cleanAddress : null,
+        date: formData.date,
+        time_slot: formData.timeSlot,
+        items: [
+          {
+            id: `custom-${Date.now()}`,
+            name: `Custom ${formData.orderType === 'cake' ? 'Cake' : 'Cupcakes'}`,
+            category: 'Custom',
+            size: formData.orderType === 'cake' ? formData.size : `Box of ${formData.cupcakeSize}`,
+            flavour: formData.flavour,
+            shape: formData.orderType === 'cake' ? formData.shape : undefined,
+            addOns: formData.addOns.map(id => ADD_ONS.find(a => a.id === id)?.label || id),
+            messageOnCake: trimValue(formData.messageOnCake),
+            theme: trimValue(formData.theme),
+            colorPreferences: trimValue(formData.colorPreferences),
+            referenceImage: referenceImageUrl || undefined,
+            specialInstructions: trimValue(formData.specialInstructions),
+            quantity: 1,
+            pricePerItem: 0,
+          }
+        ],
+        total_amount: 0,
+      });
+
+      setFormData({
+        ...formData,
+        name: cleanName,
+        phone: cleanPhone,
+        email: cleanEmail,
+        address: cleanAddress,
+        theme: trimValue(formData.theme),
+        colorPreferences: trimValue(formData.colorPreferences),
+        messageOnCake: trimValue(formData.messageOnCake),
+        specialInstructions: trimValue(formData.specialInstructions),
+      });
+      setIsSubmitted(true);
+    } catch (err) {
+      console.error('Order creation failed:', err);
+      const code = err && typeof err === 'object' && 'code' in err ? String((err as { code?: string }).code) : '';
+      if (code === '42501') {
+        setFormError('Orders are blocked by database security settings.');
+      } else {
+        setFormError('Unable to place order at the moment. Please try again later.');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const resetForm = () => {
@@ -564,7 +629,7 @@ export default function MultiStepForm() {
                         />
                         <span className="text-[#2C2C2C]">{addOn.label}</span>
                       </div>
-                      <span className="text-[#F283AE] font-semibold">Rs. {addOn.price}</span>
+                      {/* Price removed for custom orders */}
                     </label>
                   ))}
                 </div>
@@ -814,14 +879,9 @@ export default function MultiStepForm() {
                         return addOn ? (
                           <div key={addOnId} className="flex justify-between text-sm">
                             <span className="text-[#2C2C2C]">{addOn.label}</span>
-                            <span className="font-semibold text-[#F283AE]">Rs. {addOn.price}</span>
                           </div>
                         ) : null;
                       })}
-                      <div className="flex justify-between text-sm font-semibold pt-2 border-t border-[#FAC1B5]/20">
-                        <span className="text-[#2C2C2C]">Add-ons Total</span>
-                        <span className="text-[#F283AE]">Rs. {calculateAddOnsTotal()}</span>
-                      </div>
                     </div>
                   </div>
                 )}
@@ -913,10 +973,10 @@ export default function MultiStepForm() {
             ) : (
               <button
                 type="submit"
-                disabled={!currentStepValid}
+                disabled={!currentStepValid || isSubmitting}
                 className="ml-auto px-8 py-3 bg-[#F283AE] text-white rounded-full font-semibold hover:bg-[#E86FA3] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Place Order
+                {isSubmitting ? 'Placing Order...' : 'Place Order'}
               </button>
             )}
           </div>
