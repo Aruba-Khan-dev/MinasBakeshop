@@ -4,6 +4,10 @@ import { getOrders } from '@/lib/supabase';
 import { AdminSidebarProvider } from '@/context/admin-sidebar-context';
 import AdminPageLayout from '@/components/admin-page-layout';
 
+// Force dynamic rendering so Vercel always fetches fresh orders from Supabase
+// (without this, Next.js caches the server component and new orders won't appear)
+export const dynamic = 'force-dynamic';
+
 export default async function AdminOrdersPage() {
   const orders = await getOrders();
 
