@@ -16,6 +16,9 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
+        url: '/favicon.ico',
+      },
+      {
         url: '/icon-light-32x32.png',
         media: '(prefers-color-scheme: light)',
       },
@@ -23,16 +26,13 @@ export const metadata: Metadata = {
         url: '/icon-dark-32x32.png',
         media: '(prefers-color-scheme: dark)',
       },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
     ],
     apple: '/apple-icon.png',
   },
 }
 
 import { CartProvider } from '@/context/cart-context'
+import { SidebarProvider } from '@/context/sidebar-context'
 
 export default function RootLayout({
   children,
@@ -43,9 +43,11 @@ export default function RootLayout({
     <html lang="en">
       <body className={`font-sans antialiased ${greatVibes.variable}`}>
         <CartProvider>
-          <Header />
-          <SidebarNav />
-          {children}
+          <SidebarProvider>
+            <Header />
+            <SidebarNav />
+            {children}
+          </SidebarProvider>
         </CartProvider>
         <Analytics />
       </body>

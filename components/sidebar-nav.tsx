@@ -6,9 +6,10 @@ import { Menu, X, ChevronDown } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { getAllCategories } from '@/lib/supabase';
 import type { Category } from '@/lib/supabase';
+import { useSidebar } from '@/context/sidebar-context';
 
 export default function SidebarNav() {
-  const [isOpen, setIsOpen] = useState(false);
+  const { isOpen, setIsOpen } = useSidebar();
   const [expandedMenus, setExpandedMenus] = useState<Set<string>>(new Set());
   const [categories, setCategories] = useState<Category[]>([]);
   const pathname = usePathname();
@@ -26,8 +27,6 @@ export default function SidebarNav() {
   }, []);
 
   if (pathname?.startsWith('/admin')) return null;
-
-  const toggleMenu = () => setIsOpen(!isOpen);
 
   const toggleSubmenu = (menu: string) => {
     setExpandedMenus((prev) => {
@@ -62,24 +61,22 @@ export default function SidebarNav() {
 
   return (
     <>
-      {/* Hamburger Icon */}
-      <button
-        onClick={toggleMenu}
-        className="fixed top-6 left-6 z-50 p-2 hover:bg-[#F0E8DF]/50 rounded-lg transition-colors"
-        aria-label="Toggle menu"
-      >
-        {isOpen ? (
+      {/* Close button shown on top of the open sidebar */}
+      {isOpen && (
+        <button
+          onClick={() => setIsOpen(false)}
+          className="fixed top-[10px] left-4 md:left-6 z-50 p-2 hover:bg-[#F0E8DF]/50 rounded-lg transition-colors"
+          aria-label="Close menu"
+        >
           <X size={24} className="text-[#2C2C2C]" />
-        ) : (
-          <Menu size={24} className="text-[#2C2C2C]" />
-        )}
-      </button>
+        </button>
+      )}
 
       {/* Overlay */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/30 z-30"
-          onClick={toggleMenu}
+          onClick={() => setIsOpen(false)}
         />
       )}
 

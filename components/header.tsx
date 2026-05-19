@@ -1,15 +1,18 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
-import { ShoppingBag, Search, X } from 'lucide-react';
+import { ShoppingBag, Search, X, Menu } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/cart-context';
+import { useSidebar } from '@/context/sidebar-context';
 import CartDrawer from './cart-drawer';
 import HeaderSearch from './header-search';
 
 export default function Header() {
   const { totalItems } = useCart();
+  const { isOpen, setIsOpen } = useSidebar();
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const pathname = usePathname();
@@ -21,10 +24,19 @@ export default function Header() {
   }
 
   return (
-    <header className="bg-white border-b border-[#FAC1B5]/20 sticky top-0 z-30">
-      <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between relative min-h-[60px]">
+    <header className="bg-white border-b border-[#FAC1B5]/20 sticky top-0 z-30 relative">
+      {!isAdminPage && (
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="absolute left-6 top-1/2 -translate-y-1/2 p-2 hover:bg-[#F0E8DF]/50 rounded-lg transition-colors z-20"
+          aria-label="Toggle menu"
+        >
+          <Menu size={24} className="text-[#2C2C2C]" />
+        </button>
+      )}
+      <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
         {/* Left Side: Search Bar (Desktop) */}
-        <div className="flex-1 flex justify-start">
+        <div className="flex-1 flex items-center justify-start gap-4">
           {!isAdminPage && (
             <div className="hidden md:block w-full max-w-xs">
               <HeaderSearch variant="desktop" />
@@ -32,16 +44,20 @@ export default function Header() {
           )}
         </div>
 
-        {/* Center: Custom Text Logo */}
-        <Link 
-          href="/" 
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center whitespace-nowrap z-10"
+        {/* Center: Actual Logo */}
+        <Link
+          href="/"
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none"
         >
-          <span className="font-[family-name:var(--font-great-vibes)] text-4xl md:text-5xl text-[#2C2C2C] leading-none mb-1">
-            Minas
-          </span>
-          <span className="font-['Times_New_Roman',Times,serif] text-[10px] md:text-xs tracking-[0.2em] text-[#2C2C2C] leading-none uppercase font-semibold">
-            Bakeshop
+          <span className="pointer-events-auto h-12 sm:h-14 flex items-center justify-center max-w-[220px]">
+            <Image
+              src="/logo.png"
+              alt="Minas Bakeshop"
+              width={220}
+              height={56}
+              className="object-contain max-h-full w-auto mix-blend-multiply"
+              priority
+            />
           </span>
         </Link>
 

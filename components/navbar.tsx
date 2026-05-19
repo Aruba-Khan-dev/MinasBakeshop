@@ -32,18 +32,16 @@ export default function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-40 bg-white border-b border-[#FAC1B5]/30 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 md:px-8 h-16 flex items-center justify-between gap-4">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-          <div className="relative w-8 h-8">
+        <Link href="/" className="flex items-center flex-shrink-0">
+          <div className="h-11 w-[160px] sm:h-12 sm:w-[200px]">
             <Image
               src="/logo.png"
               alt="Mina's Bakeshop"
-              fill
-              className="object-contain"
+              width={200}
+              height={48}
+              className="object-contain max-h-full w-auto mix-blend-multiply"
             />
           </div>
-          <span className="font-serif text-lg font-bold text-[#2C2C2C] hidden sm:inline">
-            Mina&apos;s
-          </span>
         </Link>
 
         {/* Search Bar - Desktop */}

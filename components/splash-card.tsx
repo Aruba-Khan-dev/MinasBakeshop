@@ -21,15 +21,17 @@ export default function SplashCard() {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#E8E4DC] transition-opacity duration-500 ease-out animate-fade-in">
       {/* Logo Image as Center Focus */}
-      <div className="relative w-full h-full flex items-center justify-center">
-        <Image
-          src="/logo.png"
-          alt="Mina's Bakeshop Logo"
-          width={400}
-          height={400}
-          className="object-contain max-w-full max-h-full"
-          priority
-        />
+      <div className="relative w-full h-full flex items-center justify-center p-4">
+        <div className="max-w-[92vw] max-h-[72vh]">
+          <Image
+            src="/logo.png"
+            alt="Mina's Bakeshop Logo"
+            width={760}
+            height={266}
+            className="object-contain mix-blend-multiply"
+            priority
+          />
+        </div>
       </div>
 
       {/* Loading Indicator at Bottom */}
